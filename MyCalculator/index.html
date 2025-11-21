@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>BAC Activity Fee Calculator</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 720px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      h1 { font-size: 1.8rem; margin-bottom: 0.2rem; }
+      h2 { font-size: 1.2rem; margin-top: 2rem; }
+      label { display: block; margin-top: 12px; font-weight: 500; }
+      input[type="number"] {
+        padding: 6px 8px;
+        width: 120px;
+        margin-top: 4px;
+      }
+      button {
+        margin-top: 16px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        background: #111;
+        color: #fff;
+        cursor: pointer;
+      }
+      button:hover { background: #333; }
+      .result {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 8px;
+        background: #f5f5f5;
+      }
+      .hint { font-size: 0.85rem; color: #555; }
+      .row { display: flex; flex-wrap: wrap; gap: 16px; }
+      .col { flex: 1 1 260px; min-width: 240px; }
+    </style>
+  </head>
+  <body>
+    <h1>BAC Activity Fee Calculator / BAC 活动收费计算器</h1>
+    <p class="hint">
+      输入活动数量，点击“Calculate / 计算”即可自动得出社员与非社员的总费用。<br>
+      Enter the number of activities in each category and click Calculate.
+    </p>
+
+    <div class="row">
+      <div class="col">
+        <h2>BAC Members / 社员</h2>
+        <label>
+          Member single submissions<br>
+          社员单独提交的超额活动数量
+          <input type="number" id="member_single" min="0" value="0">
+        </label>
+        <label>
+          Member bundled submissions (2+)<br>
+          社员合并提交的超额活动数量（2个及以上）
+          <input type="number" id="member_bundle" min="0" value="0">
+        </label>
+      </div>
+      <div class="col">
+        <h2>Non-members / 非社员</h2>
+        <label>
+          Non-member single submissions<br>
+          非社员单独提交的活动数量
+          <input type="number" id="non_member_single" min="0" value="0">
+        </label>
+        <label>
+          Non-member bundled submissions (2+)<br>
+          非社员合并提交的活动数量（2个及以上）
+          <input type="number" id="non_member_bundle" min="0" value="0">
+        </label>
+      </div>
+    </div>
+
+    <button onclick="calculate()">Calculate / 计算</button>
+
+    <div id="result" class="result" style="display:none;">
+      <h2>Result / 计算结果</h2>
+      <p id="member_cost"></p>
+      <p id="non_member_cost"></p>
+      <hr>
+      <p id="total_cost"></p>
+    </div>
+
+    <script>
+      function calculateMemberCost(memberSingle, memberBundle) {
+        // Member single: 6.67 + 0.5 processing fee
+        const singleCost = memberSingle * (6.67 + 0.50);
+        // Member bundle: 6.67 - 3.33 discount, no fee
+        const bundleCost = memberBundle * (6.67 - 3.33);
+        return singleCost + bundleCost;
+      }
+
+      function calculateNonMemberCost(nonMemberSingle, nonMemberBundle) {
+        // Non-member single: 6.67 + 10 + 0.5 fee
+        const singleCost = nonMemberSingle * (6.67 + 10 + 0.50);
+        // Non-member bundle: 6.67 + 10 - 3.33 discount, no fee
+        const bundleCost = nonMemberBundle * (6.67 + 10 - 3.33);
+        return singleCost + bundleCost;
+      }
+
+      function calculate() {
+        const ms  = parseInt(document.getElementById("member_single").value || "0", 10);
+        const mb  = parseInt(document.getElementById("member_bundle").value || "0", 10);
+        const nms = parseInt(document.getElementById("non_member_single").value || "0", 10);
+        const nmb = parseInt(document.getElementById("non_member_bundle").value || "0", 10);
+
+        const memberCost     = calculateMemberCost(ms, mb);
+        const nonMemberCost  = calculateNonMemberCost(nms, nmb);
+        const totalCost      = memberCost + nonMemberCost;
+
+        document.getElementById("member_cost").textContent =
+          `Member Cost / 社员费用: $${memberCost.toFixed(2)}`;
+        document.getElementById("non_member_cost").textContent =
+          `Non-member Cost / 非社员费用: $${nonMemberCost.toFixed(2)}`;
+        document.getElementById("total_cost").textContent =
+          `Total Amount to Charge / 总费用: $${totalCost.toFixed(2)}`;
+
+        document.getElementById("result").style.display = "block";
+      }
+    </script>
+  </body>
+</html>
